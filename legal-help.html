@@ -1,90 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Lease-Decoder-AI | Get Legal Help</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-  <header class="site-header">
-    <div class="site-logo">Tenant Help</div>
-    <nav class="site-nav">
-      <a href="index.html">Home</a>
-      <a href="lease-decoder.html">Lease Decoder AI</a>
-      <a href="lease-red-flags.html">Lease Red Flags</a>
-      <a href="common-questions.html">Common Lease Questions</a>
-      <a href="legal-help.html" class="active">Get Legal Help</a>
-    </nav>
-  </header>
-
-  <main>
-    <h2>Get Legal Help</h2>
-    <p>
-      Use this tool to find tenant legal help based on your location. This is an early
-      version and currently only supports Alaska, but more states will be added over time.
-    </p>
-
-    <!-- Location selector -->
-    <section style="margin-top: 1.5rem;">
-      <h3>Find help in your area</h3>
-      <p><em>Start by choosing your state, then county, and university (if applicable).</em></p>
-
-      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 500px;">
-        <!-- State -->
-        <div>
-          <label for="stateSelect"><strong>State</strong></label><br />
-          <select id="stateSelect">
-            <option value="">-- Select a state --</option>
-          </select>
-        </div>
-
-        <!-- County -->
-        <div>
-          <label for="countySelect"><strong>County / Borough</strong></label><br />
-          <select id="countySelect" disabled>
-            <option value="">-- Select a county / borough --</option>
-          </select>
-        </div>
-
-        <!-- University -->
-        <div>
-          <label for="universitySelect"><strong>University (optional)</strong></label><br />
-          <select id="universitySelect" disabled>
-            <option value="">-- No university selected --</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <!-- Results -->
-    <section style="margin-top: 2rem;">
-      <h3>Results</h3>
-      <div id="legalHelpResults">
-        <p><em>Select your state and county to see available tenant legal help.</em></p>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    © 2025 Tenant Help — This site does not provide legal advice. Information is for general
-    guidance only. For specific legal advice, contact a licensed attorney.
-  </footer>
-
   <script>
     // ========= DATA =========
     // Right now we only support Alaska. More states can be added later.
     const legalData = {
       "Alaska": {
         counties: [
+          "Aleutians East",
+          "Aleutians West",
           "Anchorage",
-          "Fairbanks North Star County",
-          "Matanuska-Susitna County",
-          "Kenai Peninsula County",
-          "Juneau County",
-          "Bethel County",
-          "Southeast Fairbanks County",
-          "Valdez-Cordova County"
+          "Bethel",
+          "Bristol Bay",
+          "Chugach",
+          "Copper River",
+          "Denali",
+          "Dillingham",
+          "Fairbanks North Star",
+          "Haines",
+          "Hoonah-Angoon",
+          "Juneau",
+          "Kenai Peninsula",
+          "Ketchikan Gateway",
+          "Kodiak Island",
+          "Kusilvak",
+          "Lake and Peninsula",
+          "Matanuska-Susitna",
+          "Nome",
+          "North Slope",
+          "Northwest Arctic",
+          "Petersburg",
+          "Prince of Wales - Hyder",
+          "Sitka",
+          "Skagway",
+          "Southeast Fairbanks",
+          "Wrangell",
+          "Yakutat",
+          "Yukon-Koyukuk"
         ],
         universities: [
           "University of Alaska Anchorage",
