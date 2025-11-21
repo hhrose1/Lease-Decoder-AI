@@ -21,14 +21,228 @@
   <main>
     <h2>Get Legal Help</h2>
     <p>
-      This page will help you find free or low-cost tenant legal aid,
-      student legal services, and other support in your area.
+      Use this tool to find tenant legal help based on your location. This is an early
+      version and currently only supports Alaska, but more states will be added over time.
     </p>
-    <p><em>Resource finder coming soon.</em></p>
+
+    <!-- Location selector -->
+    <section style="margin-top: 1.5rem;">
+      <h3>Find help in your area</h3>
+      <p><em>Start by choosing your state, then county, and university (if applicable).</em></p>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 500px;">
+        <!-- State -->
+        <div>
+          <label for="stateSelect"><strong>State</strong></label><br />
+          <select id="stateSelect">
+            <option value="">-- Select a state --</option>
+          </select>
+        </div>
+
+        <!-- County -->
+        <div>
+          <label for="countySelect"><strong>County / Borough</strong></label><br />
+          <select id="countySelect" disabled>
+            <option value="">-- Select a county / borough --</option>
+          </select>
+        </div>
+
+        <!-- University -->
+        <div>
+          <label for="universitySelect"><strong>University (optional)</strong></label><br />
+          <select id="universitySelect" disabled>
+            <option value="">-- No university selected --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section style="margin-top: 2rem;">
+      <h3>Results</h3>
+      <div id="legalHelpResults">
+        <p><em>Select your state and county to see available tenant legal help.</em></p>
+      </div>
+    </section>
   </main>
 
   <footer>
-    © 2025 Tenant Help — This site does not provide legal advice.
+    © 2025 Tenant Help — This site does not provide legal advice. Information is for general
+    guidance only. For specific legal advice, contact a licensed attorney.
   </footer>
+
+  <script>
+    // ========= DATA =========
+    // Right now we only support Alaska. More states can be added later.
+    const legalData = {
+      "Alaska": {
+        counties: [
+          "Anchorage",
+          "Fairbanks North Star County",
+          "Matanuska-Susitna County",
+          "Kenai Peninsula County",
+          "Juneau County",
+          "Bethel County",
+          "Southeast Fairbanks County",
+          "Valdez-Cordova County"
+        ],
+        universities: [
+          "University of Alaska Anchorage",
+          "University of Alaska Fairbanks",
+          "University of Alaska Southeast",
+          "Alaska Bible College",
+          "Alaska Pacific University",
+          "Saint Herman Theological Seminary",
+          "Iḷisaġvik College",
+          "Kenai Peninsula College",
+          "Kodiak College",
+          "Matanuska–Susitna College",
+          "Prince William Sound College",
+          "Other / Not Listed"
+        ],
+        resource: {
+          name: "Alaska Legal Services Corporation",
+          website: "https://www.alsc-law.org/helpline/",
+          description: "Non-profit legal aid organization providing free civil legal services to low-income Alaskans.",
+          generalHelpline: {
+            phone: "1-855-743-1001",
+            details: "Free legal help from 6–8 p.m., Monday–Thursday (Alaska Legal Services Helpline)."
+          },
+          evictionLine: {
+            phone: "1-888-478-2572",
+            details: "If you are being evicted for any reason, call this number to apply for legal help."
+          }
+        }
+      }
+    };
+
+    // ========= ELEMENTS =========
+    const stateSelect = document.getElementById("stateSelect");
+    const countySelect = document.getElementById("countySelect");
+    const universitySelect = document.getElementById("universitySelect");
+    const resultsDiv = document.getElementById("legalHelpResults");
+
+    // If the page didn't load these elements for some reason, just stop.
+    if (stateSelect && countySelect && universitySelect && resultsDiv) {
+      initLocationForm();
+    }
+
+    function initLocationForm() {
+      // Populate states (only Alaska for now)
+      const states = Object.keys(legalData).sort();
+      states.forEach((state) => {
+        const opt = document.createElement("option");
+        opt.value = state;
+        opt.textContent = state;
+        stateSelect.appendChild(opt);
+      });
+
+      // Event listeners
+      stateSelect.addEventListener("change", handleStateChange);
+      countySelect.addEventListener("change", updateResults);
+      universitySelect.addEventListener("change", updateResults);
+    }
+
+    function handleStateChange() {
+      const state = stateSelect.value;
+
+      // Reset lower dropdowns
+      countySelect.innerHTML = '<option value="">-- Select a county / borough --</option>';
+      countySelect.disabled = true;
+
+      universitySelect.innerHTML = '<option value="">-- No university selected --</option>';
+      universitySelect.disabled = true;
+
+      if (!state || !legalData[state]) {
+        resultsDiv.innerHTML = "<p><em>Select your state and county to see available tenant legal help.</em></p>";
+        return;
+      }
+
+      const stateInfo = legalData[state];
+
+      // Populate counties
+      stateInfo.counties.forEach((county) => {
+        const opt = document.createElement("option");
+        opt.value = county;
+        opt.textContent = county;
+        countySelect.appendChild(opt);
+      });
+      countySelect.disabled = false;
+
+      // Populate universities (same list for now anywhere in Alaska)
+      stateInfo.universities.forEach((uni) => {
+        const opt = document.createElement("option");
+        opt.value = uni;
+        opt.textContent = uni;
+        universitySelect.appendChild(opt);
+      });
+      universitySelect.disabled = false;
+
+      // Update results whenever state changes
+      updateResults();
+    }
+
+    function updateResults() {
+      const state = stateSelect.value;
+      const county = countySelect.value;
+      const university = universitySelect.value;
+
+      if (!state || !legalData[state]) {
+        resultsDiv.innerHTML = "<p><em>Select your state and county to see available tenant legal help.</em></p>";
+        return;
+      }
+
+      const { resource } = legalData[state];
+
+      // Build the results HTML
+      let locationLine = "";
+      if (county && university) {
+        locationLine = `<p><strong>Selected location:</strong> ${county}, ${state}${university ? " — " + university : ""}</p>`;
+      } else if (county) {
+        locationLine = `<p><strong>Selected location:</strong> ${county}, ${state}</p>`;
+      } else {
+        locationLine = `<p><strong>Selected location:</strong> ${state}</p>`;
+      }
+
+      resultsDiv.innerHTML = `
+        ${locationLine}
+        <div style="
+          margin-top: 1rem;
+          padding: 1rem 1.25rem;
+          border-radius: 10px;
+          border: 1px solid #e5e7eb;
+          background: #f9fafb;
+        ">
+          <h4 style="margin-top: 0;">Recommended Tenant Legal Aid</h4>
+          <p>
+            <strong>${resource.name}</strong><br />
+            <a href="${resource.website}" target="_blank" rel="noopener noreferrer">
+              ${resource.website}
+            </a>
+          </p>
+          <p>${resource.description}</p>
+          <p>
+            <strong>General Helpline:</strong><br />
+            Phone: ${resource.generalHelpline.phone}<br />
+            <span style="font-size: 0.9rem; color: #4b5563;">
+              ${resource.generalHelpline.details}
+            </span>
+          </p>
+          <p>
+            <strong>Eviction Line:</strong><br />
+            Phone: ${resource.evictionLine.phone}<br />
+            <span style="font-size: 0.9rem; color: #4b5563;">
+              ${resource.evictionLine.details}
+            </span>
+          </p>
+          <p style="font-size: 0.85rem; color: #6b7280; margin-top: 0.75rem;">
+            This information is based on publicly available resources and may not be exhaustive.
+            If you are in immediate danger of losing housing, contact Alaska Legal Services
+            as soon as possible and consider reaching out to local emergency or social services.
+          </p>
+        </div>
+      `;
+    }
+  </script>
 </body>
 </html>
