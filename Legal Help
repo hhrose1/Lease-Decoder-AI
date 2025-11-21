@@ -1,0 +1,195 @@
+// ==== DATA SECTION ====
+// Edit this object to add your own states / counties / universities / resources.
+const locationData = {
+  "Maryland": {
+    "Prince George's County": {
+      universities: [
+        "University of Maryland, College Park",
+        "Prince George’s Community College",
+        "Other / Not Listed"
+      ],
+      resources: [
+        {
+          name: "Maryland Legal Aid",
+          type: "Legal Aid",
+          website: "https://www.mdlab.org/"
+        },
+        {
+          name: "UMD Student Legal Aid Office",
+          type: "Student Legal Services",
+          website: "https://studentorg.umd.edu/slao"
+        }
+      ]
+    },
+    "Montgomery County": {
+      universities: [
+        "Montgomery College",
+        "Universities at Shady Grove",
+        "Other / Not Listed"
+      ],
+      resources: [
+        {
+          name: "Community Legal Services of Montgomery County",
+          type: "Legal Aid",
+          website: "https://www.clsmd.org/"
+        }
+      ]
+    }
+  },
+  "New York": {
+    "Kings County (Brooklyn)": {
+      universities: [
+        "Brooklyn College",
+        "NYU Tandon",
+        "Other / Not Listed"
+      ],
+      resources: [
+        {
+          name: "Legal Services NYC – Brooklyn",
+          type: "Legal Aid",
+          website: "https://www.legalservicesnyc.org/"
+        }
+      ]
+    },
+    "New York County (Manhattan)": {
+      universities: [
+        "Columbia University",
+        "NYU",
+        "CUNY (Various)",
+        "Other / Not Listed"
+      ],
+      resources: [
+        {
+          name: "The Legal Aid Society – Manhattan",
+          type: "Legal Aid",
+          website: "https://legalaidnyc.org/"
+        }
+      ]
+    }
+  }
+};
+
+// ==== LOGIC SECTION ====
+
+const stateSelect = document.getElementById("stateSelect");
+const countySelect = document.getElementById("countySelect");
+const universitySelect = document.getElementById("universitySelect");
+const resultsDiv = document.getElementById("results");
+
+// Populate state dropdown
+function populateStates() {
+  const states = Object.keys(locationData).sort();
+  states.forEach((state) => {
+    const opt = document.createElement("option");
+    opt.value = state;
+    opt.textContent = state;
+    stateSelect.appendChild(opt);
+  });
+}
+
+// Populate counties based on selected state
+function populateCounties(state) {
+  countySelect.innerHTML = '<option value="">-- Select a county --</option>';
+  universitySelect.innerHTML = '<option value="">-- No university selected --</option>';
+  universitySelect.disabled = true;
+
+  if (!state || !locationData[state]) {
+    countySelect.disabled = true;
+    return;
+  }
+
+  const counties = Object.keys(locationData[state]).sort();
+  counties.forEach((county) => {
+    const opt = document.createElement("option");
+    opt.value = county;
+    opt.textContent = county;
+    countySelect.appendChild(opt);
+  });
+
+  countySelect.disabled = false;
+}
+
+// Populate universities based on selected county
+function populateUniversities(state, county) {
+  universitySelect.innerHTML = '<option value="">-- No university selected --</option>';
+
+  if (!state || !county || !locationData[state] || !locationData[state][county]) {
+    universitySelect.disabled = true;
+    return;
+  }
+
+  const universities = locationData[state][county].universities || [];
+  universities.forEach((uni) => {
+    const opt = document.createElement("option");
+    opt.value = uni;
+    opt.textContent = uni;
+    universitySelect.appendChild(opt);
+  });
+
+  universitySelect.disabled = false;
+}
+
+// Show resources based on current selections
+function showResources() {
+  const state = stateSelect.value;
+  const county = countySelect.value;
+
+  resultsDiv.innerHTML = "";
+
+  if (!state || !county || !locationData[state] || !locationData[state][county]) {
+    resultsDiv.innerHTML = "<p><em>Please choose a state and county to see resources.</em></p>";
+    return;
+  }
+
+  const data = locationData[state][county];
+  const resources = data.resources || [];
+
+  if (resources.length === 0) {
+    resultsDiv.innerHTML = "<p><strong>No resources listed yet for this area.</strong><br>You may want to search for local legal aid or a tenant union.</p>";
+    return;
+  }
+
+  const heading = document.createElement("h4");
+  heading.textContent = "Resources in your area:";
+  resultsDiv.appendChild(heading);
+
+  const list = document.createElement("ul");
+  resources.forEach((res) => {
+    const li = document.createElement("li");
+    const linkPart = res.website
+      ? ` - <a href="${res.website}" target="_blank" rel="noopener noreferrer">${res.website}</a>`
+      : "";
+    li.innerHTML = `<strong>${res.name}</strong> (${res.type})${linkPart}`;
+    list.appendChild(li);
+  });
+
+  resultsDiv.appendChild(list);
+
+  const disclaimer = document.createElement("p");
+  disclaimer.innerHTML = `<em>This list is informational only and may not include all organizations in your area. For specific legal advice, contact a licensed attorney or legal aid office.</em>`;
+  resultsDiv.appendChild(disclaimer);
+}
+
+// Event listeners
+stateSelect.addEventListener("change", () => {
+  const state = stateSelect.value;
+  populateCounties(state);
+  showResources();
+});
+
+countySelect.addEventListener("change", () => {
+  const state = stateSelect.value;
+  const county = countySelect.value;
+  populateUniversities(state, county);
+  showResources();
+});
+
+universitySelect.addEventListener("change", () => {
+  // Right now, university choice doesn't change the resources,
+  // but you could customize that later if needed.
+  showResources();
+});
+
+// Initialize
+populateStates();
+showResources();
